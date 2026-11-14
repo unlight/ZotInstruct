@@ -1,4 +1,4 @@
-# ZotInstruct
+# Zot Instruct
 
 A Sublime Text 4 plugin that sends the selected code together with an instruction
 to the active [zot](https://www.zot.sh/) session through the local HTTP server of
@@ -29,7 +29,7 @@ No third-party dependencies: the plugin uses the bundled Python 3.8 only.
 1. Select code or text. Multiple selections are supported and joined with a blank
    line. With an empty selection the plugin sends only the instruction.
 2. Press `Alt+Enter` (`Option+Enter` on macOS) or run
-   `ZotInstruct: Send Selection with Instruction` from the Command Palette
+   `Zot Instruct: Send Selection with Instruction` from the Command Palette
    (`Ctrl+Shift+P`).
 3. Type the instruction in the input panel and press `Enter`. The panel is
    prefilled with the last instruction used for this file in the current Sublime
@@ -38,12 +38,12 @@ No third-party dependencies: the plugin uses the bundled Python 3.8 only.
 
 Additional command:
 
-- `ZotInstruct: Send Prompt Only` (`zot_instruct_prompt`) sends the instruction
+- `Zot Instruct: Send Prompt Only` (`zot_instruct_prompt`) sends the instruction
   without code. This is what `Alt+Enter` runs when the selection is empty.
 
 ## Settings
 
-`Preferences > Package Settings > ZotInstruct > Settings` opens the settings;
+`Preferences > Package Settings > Zot Instruct > Settings` opens the settings;
 `Key Bindings` opens the keymap. Files in `Packages/User/` override the
 defaults.
 

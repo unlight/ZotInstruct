@@ -13,7 +13,7 @@ CONFIG_KEY = "zot_instruct"
 SEND_URL_TEMPLATE = "http://127.0.0.1:{}/send"
 HEALTH_TIMEOUT = 1
 INPUT_CAPTION = "Instruction"
-UNAVAILABLE_MESSAGE = "ZotInstruct: zot is not running for this project"
+UNAVAILABLE_MESSAGE = "Zot Instruct: zot is not running for this project"
 
 _HISTORY = {}
 
@@ -201,7 +201,7 @@ def _post(url, port, payload, timeout):
     with urllib.request.urlopen(request, timeout=timeout) as response:
       response.read()
   except urllib.error.HTTPError as exc:
-    message = "ZotInstruct: " + _http_error_text(exc)
+    message = "Zot Instruct: " + _http_error_text(exc)
     print("[ZotInstruct] {}: {}".format(url, message))
     sublime.set_timeout(lambda: sublime.status_message(message), 0)
     return
@@ -212,7 +212,7 @@ def _post(url, port, payload, timeout):
     )
     return
 
-  message = "ZotInstruct: sent to zot (port {})".format(port)
+  message = "Zot Instruct: sent to zot (port {})".format(port)
   sublime.set_timeout(lambda: sublime.status_message(message), 0)
 
 
@@ -281,7 +281,7 @@ class ZotInstructCommand(sublime_plugin.TextCommand):
   def run(self, edit):
     code = _selection_text(self.view)
     if not code:
-      sublime.status_message("ZotInstruct: select some text or code")
+      sublime.status_message("Zot Instruct: select some text or code")
       return
     window = self.view.window()
     if window is not None:
@@ -292,6 +292,6 @@ class ZotInstructPromptCommand(sublime_plugin.WindowCommand):
   def run(self):
     view = self.window.active_view()
     if view is None:
-      sublime.status_message("ZotInstruct: no active file")
+      sublime.status_message("Zot Instruct: no active file")
       return
     _prompt(self.window, view, "")
