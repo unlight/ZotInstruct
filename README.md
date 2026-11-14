@@ -24,13 +24,17 @@ Restart Sublime Text or run `sublime_plugin.reload_plugin` from the console
 
 No third-party dependencies: the plugin uses the bundled Python 3.8 only.
 
+Key bindings are opt-in: copy the commented `alt+enter` entries from
+`Packages/ZotInstruct/Default.sublime-keymap` into `Preferences > Key Bindings`.
+Without them use the Command Palette.
+
 ## Usage
 
 1. Select code or text. Multiple selections are supported and joined with a blank
    line. With an empty selection the plugin sends only the instruction.
-2. Press `Alt+Enter` (`Option+Enter` on macOS) or run
-   `Zot Instruct: Send Selection with Instruction` from the Command Palette
-   (`Ctrl+Shift+P`).
+2. Press `Alt+Enter` (`Option+Enter` on macOS), if the optional bindings are
+   enabled, or run `Zot Instruct: Send Selection with Instruction` from the
+   Command Palette (`Ctrl+Shift+P`).
 3. Type the instruction in the input panel and press `Enter`. The panel is
    prefilled with the last instruction used for this file in the current Sublime
    Text session, or with the template for the file extension from the settings.
@@ -39,7 +43,8 @@ No third-party dependencies: the plugin uses the bundled Python 3.8 only.
 Additional command:
 
 - `Zot Instruct: Send Prompt Only` (`zot_instruct_prompt`) sends the instruction
-  without code. This is what `Alt+Enter` runs when the selection is empty.
+  without code. This is what the optional `Alt+Enter` binding runs when the
+  selection is empty.
 
 ## Settings
 

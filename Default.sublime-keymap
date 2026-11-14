@@ -1,20 +1,21 @@
 [
-	{
-		"keys": ["alt+enter"],
-		"command": "zot_instruct",
-		"context": [
-			{"key": "selection_empty", "operator": "equal", "operand": false},
-			{"key": "panel_has_focus", "operator": "equal", "operand": false},
-			{"key": "overlay_has_focus", "operator": "equal", "operand": false}
-		]
-	},
-	{
-		"keys": ["alt+enter"],
-		"command": "zot_instruct_prompt",
-		"context": [
-			{"key": "selection_empty", "operator": "equal", "operand": true},
-			{"key": "panel_has_focus", "operator": "equal", "operand": false},
-			{"key": "overlay_has_focus", "operator": "equal", "operand": false}
-		]
-	}
+	// Suggestions only. Copy these into Preferences > Key Bindings to enable.
+	// {
+	// 	"keys": ["alt+enter"],
+	// 	"command": "zot_instruct",
+	// 	"context": [
+	// 		{"key": "selection_empty", "operator": "equal", "operand": false},
+	// 		{"key": "panel_has_focus", "operator": "equal", "operand": false},
+	// 		{"key": "overlay_has_focus", "operator": "equal", "operand": false}
+	// 	]
+	// },
+	// {
+	// 	"keys": ["alt+enter"],
+	// 	"command": "zot_instruct_prompt",
+	// 	"context": [
+	// 		{"key": "selection_empty", "operator": "equal", "operand": true},
+	// 		{"key": "panel_has_focus", "operator": "equal", "operand": false},
+	// 		{"key": "overlay_has_focus", "operator": "equal", "operand": false}
+	// 	]
+	// }
 ]
