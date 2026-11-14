@@ -13,7 +13,7 @@ CONFIG_KEY = "zot_instruct"
 DEFAULT_PORT_FILE = "~/.zot/editor-bridge.port"
 FALLBACK_PORT = 47123
 INPUT_CAPTION = "Zot Instruction:"
-UNAVAILABLE_MESSAGE = "ZotInstruct: zot-editor-bridge недоступен (запустите zot)"
+UNAVAILABLE_MESSAGE = "ZotInstruct: zot-editor-bridge unavailable (start zot)"
 
 _HISTORY = {}
 
@@ -110,8 +110,8 @@ def _initial_instruction(view, config):
 
 def _sent_text(port):
   if port:
-    return "ZotInstruct: отправлено в zot (порт {})".format(port)
-  return "ZotInstruct: отправлено в zot"
+    return "ZotInstruct: sent to zot (port {})".format(port)
+  return "ZotInstruct: sent to zot"
 
 
 def _http_error_text(exc):
@@ -198,7 +198,7 @@ class ZotInstructCommand(sublime_plugin.TextCommand):
   def run(self, edit):
     code = _selection_text(self.view)
     if not code:
-      sublime.status_message("ZotInstruct: выделите текст или код")
+      sublime.status_message("ZotInstruct: select some text or code")
       return
     window = self.view.window()
     if window is not None:
@@ -209,6 +209,6 @@ class ZotInstructPromptCommand(sublime_plugin.WindowCommand):
   def run(self):
     view = self.window.active_view()
     if view is None:
-      sublime.status_message("ZotInstruct: нет активного файла")
+      sublime.status_message("ZotInstruct: no active file")
       return
     _prompt(self.window, view, "")

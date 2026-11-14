@@ -114,7 +114,7 @@ curl http://127.0.0.1:$(cat ~/.zot/editor-bridge.port)/health
 Errors appear in the status bar; details are printed to the Sublime Text console
 (``Ctrl+` ``) with the `[ZotInstruct]` prefix.
 
-- `zot-editor-bridge недоступен (запустите zot)` means the port does not answer:
+- `zot-editor-bridge unavailable (start zot)` means the port does not answer:
   make sure zot is running with the extension and the port file exists.
 - `HTTP 4xx/5xx` means the server returned an error; the response text is shown
   in the status bar and the console.
