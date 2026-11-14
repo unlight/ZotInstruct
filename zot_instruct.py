@@ -11,6 +11,7 @@ import sublime_plugin
 SETTINGS_FILE = "ZotInstruct.sublime-settings"
 CONFIG_KEY = "zot_instruct"
 FALLBACK_PORT = 47123
+SEND_URL_TEMPLATE = "http://127.0.0.1:{}/send"
 INPUT_CAPTION = "Instruction"
 UNAVAILABLE_MESSAGE = "ZotInstruct: zot-editor-bridge unavailable (start zot)"
 
@@ -86,10 +87,10 @@ def _resolve_target(config):
   for path in _port_file_candidates(config):
     port = _read_port(path)
     if port is not None:
-      return "http://127.0.0.1:{}/send".format(port), port
+      return SEND_URL_TEMPLATE.format(port), port
 
   port = int(config["fallback_port"])
-  return "http://127.0.0.1:{}/send".format(port), port
+  return SEND_URL_TEMPLATE.format(port), port
 
 
 def _language(view):
