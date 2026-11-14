@@ -52,7 +52,7 @@ default behavior is preserved.
 | Setting | Default | Meaning |
 | --- | --- | --- |
 | `url` | `""` | Full `/send` URL. A non-empty value disables port file discovery. |
-| `port_file` | `"~/.zot/editor-bridge.port"` | File with the port number; `~` is expanded. |
+| `port_file` | `""` | Explicit port file path; `~` is expanded. Empty enables state directory discovery. |
 | `fallback_port` | `47123` | Port used when the port file is missing or empty. |
 | `request_timeout` | `5` | HTTP request timeout in seconds. |
 | `mode` | `"prompt"` | `prompt` submits the request to the agent, `notify` only reports status. |
@@ -82,15 +82,19 @@ These keys override `ZotInstruct.sublime-settings` for that project only.
 
 ## zot-editor-bridge integration
 
-The `zot-editor-bridge` extension starts an HTTP server on `127.0.0.1` and
-publishes its port in a file:
+The `zot-editor-bridge` extension starts an HTTP server on `127.0.0.1` and writes
+its port to `editor-bridge.port` in zot's state directory:
 
-1. `$ZOT_HOME/editor-bridge.port` when `ZOT_HOME` is set;
-2. otherwise in the zot state directory, plus `~/.zot/editor-bridge.port` on
-   Linux.
+1. `$ZOT_HOME` when set;
+2. `$XDG_STATE_HOME/zot` when `XDG_STATE_HOME` is set;
+3. otherwise `~/.local/state/zot` on Linux, `~/Library/Application Support/zot`
+   on macOS, or `%LOCALAPPDATA%\zot` on Windows.
 
-The plugin reads `~/.zot/editor-bridge.port`; if the file is missing and
-`ZOT_HOME` is set, it falls back to `$ZOT_HOME/editor-bridge.port`.
+When `ZOT_HOME` is unset, the bridge also writes a compatible copy to
+`~/.zot/editor-bridge.port`.
+
+Unless `port_file` is set, the plugin checks the same locations in this order,
+with the legacy `~/.zot` copy last.
 
 Install the extension:
 
@@ -105,8 +109,9 @@ command shows the current `/send` and `/health` URLs.
 Manual check:
 
 ```bash
-cat ~/.zot/editor-bridge.port
-curl http://127.0.0.1:$(cat ~/.zot/editor-bridge.port)/health
+# Linux default; adjust for ZOT_HOME or XDG_STATE_HOME
+PORT=$(cat ~/.local/state/zot/editor-bridge.port)
+curl "http://127.0.0.1:$PORT/health"
 ```
 
 ## Troubleshooting

@@ -10,7 +10,6 @@ import sublime_plugin
 
 SETTINGS_FILE = "ZotInstruct.sublime-settings"
 CONFIG_KEY = "zot_instruct"
-DEFAULT_PORT_FILE = "~/.zot/editor-bridge.port"
 FALLBACK_PORT = 47123
 INPUT_CAPTION = "Zot Instruction:"
 UNAVAILABLE_MESSAGE = "ZotInstruct: zot-editor-bridge unavailable (start zot)"
@@ -27,7 +26,7 @@ def _load_config(window):
   settings = sublime.load_settings(SETTINGS_FILE)
   config = {
     "url": _setting(settings, "url", ""),
-    "port_file": _setting(settings, "port_file", DEFAULT_PORT_FILE),
+    "port_file": _setting(settings, "port_file", ""),
     "fallback_port": _setting(settings, "fallback_port", FALLBACK_PORT),
     "request_timeout": _setting(settings, "request_timeout", 5),
     "mode": _setting(settings, "mode", "prompt"),
@@ -51,18 +50,40 @@ def _read_port(path):
   return port if 0 < port < 65536 else None
 
 
+def _env(name):
+  return (os.environ.get(name) or "").strip()
+
+
+def _port_file_candidates(config):
+  port_file = str(config["port_file"]).strip()
+  if port_file:
+    return [os.path.expanduser(port_file)]
+
+  # Mirrors zot's state dir, then the bridge's legacy ~/.zot copy.
+  home = os.path.expanduser("~")
+  xdg_state = _env("XDG_STATE_HOME")
+  dirs = [
+    _env("ZOT_HOME"),
+    os.path.join(xdg_state, "zot") if xdg_state else "",
+    _env("LOCALAPPDATA"),
+    os.path.join(home, ".local", "state", "zot"),
+    os.path.join(home, "Library", "Application Support", "zot"),
+    os.path.join(home, ".zot"),
+  ]
+  paths = []
+  for directory in dirs:
+    path = os.path.join(directory, "editor-bridge.port") if directory else ""
+    if path and path not in paths:
+      paths.append(path)
+  return paths
+
+
 def _resolve_target(config):
   url = str(config["url"]).strip()
   if url:
     return url, urllib.parse.urlsplit(url).port
 
-  port_file = os.path.expanduser(str(config["port_file"]))
-  paths = [port_file]
-  zot_home = os.environ.get("ZOT_HOME")
-  if zot_home and not os.path.exists(port_file):
-    paths.append(os.path.join(zot_home, "editor-bridge.port"))
-
-  for path in paths:
+  for path in _port_file_candidates(config):
     port = _read_port(path)
     if port is not None:
       return "http://127.0.0.1:{}/send".format(port), port

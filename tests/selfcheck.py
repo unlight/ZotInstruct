@@ -33,7 +33,7 @@ spec.loader.exec_module(plugin)
 def _config(**overrides):
   config = {
     "url": "",
-    "port_file": "~/.zot/editor-bridge.port",
+    "port_file": "",
     "fallback_port": 47123,
     "request_timeout": 5,
     "mode": "prompt",
@@ -43,36 +43,67 @@ def _config(**overrides):
   return config
 
 
+def _write_port(path, port):
+  os.makedirs(os.path.dirname(path), exist_ok=True)
+  with open(path, "w", encoding="utf-8") as handle:
+    handle.write(str(port))
+
+
+def _clear_env():
+  for name in ("ZOT_HOME", "XDG_STATE_HOME", "LOCALAPPDATA"):
+    os.environ.pop(name, None)
+
+
+def _port(config):
+  return plugin._resolve_target(_config(**config))[1]
+
+
+assert plugin._resolve_target(
+  _config(url="http://example.test:9000/send")
+) == ("http://example.test:9000/send", 9000)
+
 with tempfile.TemporaryDirectory() as directory:
-  port_file = os.path.join(directory, "editor-bridge.port")
+  home = os.path.join(directory, "home")
+  os.makedirs(home)
+  saved_home = os.environ.get("HOME")
+  os.environ["HOME"] = home
+  _clear_env()
 
+  explicit = os.path.join(directory, "custom.port")
+  _write_port(explicit, 5000)
   assert plugin._resolve_target(
-    _config(url="http://example.test:9000/send", port_file=port_file)
-  ) == ("http://example.test:9000/send", 9000)
+    _config(port_file=explicit, fallback_port=1)
+  ) == ("http://127.0.0.1:5000/send", 5000)
 
-  with open(port_file, "w", encoding="utf-8") as handle:
-    handle.write("51234\n")
-  assert plugin._resolve_target(
-    _config(port_file=port_file)
-  ) == ("http://127.0.0.1:51234/send", 51234)
+  _write_port(explicit, 0)
+  assert _port({"port_file": explicit, "fallback_port": 1}) == 1
+  assert _port({
+    "port_file": os.path.join(directory, "missing.port"), "fallback_port": 1,
+  }) == 1
 
-  with open(port_file, "w", encoding="utf-8") as handle:
-    handle.write("not-a-port")
-  assert plugin._resolve_target(
-    _config(port_file=port_file, fallback_port=1234)
-  ) == ("http://127.0.0.1:1234/send", 1234)
+  _write_port(os.path.join(home, ".zot", "editor-bridge.port"), 1111)
+  assert _port({"fallback_port": 1}) == 1111
 
-  with open(os.path.join(directory, "editor-bridge.port"), "w", encoding="utf-8") as handle:
-    handle.write("4321")
-  os.environ["ZOT_HOME"] = directory
-  assert plugin._resolve_target(
-    _config(port_file=os.path.join(directory, "missing.port"), fallback_port=1)
-  ) == ("http://127.0.0.1:4321/send", 4321)
+  _write_port(
+    os.path.join(home, ".local", "state", "zot", "editor-bridge.port"), 2222
+  )
+  assert _port({"fallback_port": 1}) == 2222
 
-  os.environ.pop("ZOT_HOME")
-  assert plugin._resolve_target(
-    _config(port_file=os.path.join(directory, "missing.port"), fallback_port=1)
-  ) == ("http://127.0.0.1:1/send", 1)
+  xdg = os.path.join(directory, "xdg")
+  os.environ["XDG_STATE_HOME"] = xdg
+  _write_port(os.path.join(xdg, "zot", "editor-bridge.port"), 3333)
+  assert _port({"fallback_port": 1}) == 3333
+
+  zot_home = os.path.join(directory, "zot_home")
+  os.environ["ZOT_HOME"] = zot_home
+  _write_port(os.path.join(zot_home, "editor-bridge.port"), 4444)
+  assert _port({"fallback_port": 1}) == 4444
+
+  if saved_home is None:
+    os.environ.pop("HOME", None)
+  else:
+    os.environ["HOME"] = saved_home
+  _clear_env()
 
 defaults = {
   "py": "python",
