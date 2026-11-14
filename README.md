@@ -43,7 +43,7 @@ Additional command:
 
 ## Settings
 
-`Preferences > Package Settings > ZotInstruct > Settings` (the file
+`Preferences > Package Settings > ZotInstruct` opens the settings (the file
 `Packages/User/ZotInstruct.sublime-settings` overrides the defaults).
 
 | Setting | Default | Meaning |
