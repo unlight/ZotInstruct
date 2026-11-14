@@ -1,16 +1,20 @@
 [
 	{
-		"keys": ["ctrl+enter"],
+		"keys": ["alt+enter"],
 		"command": "zot_instruct",
 		"context": [
-			{"key": "selection_empty", "operator": "equal", "operand": false}
+			{"key": "selection_empty", "operator": "equal", "operand": false},
+			{"key": "panel_has_focus", "operator": "equal", "operand": false},
+			{"key": "overlay_has_focus", "operator": "equal", "operand": false}
 		]
 	},
 	{
-		"keys": ["super+enter"],
-		"command": "zot_instruct",
+		"keys": ["alt+enter"],
+		"command": "zot_instruct_prompt",
 		"context": [
-			{"key": "selection_empty", "operator": "equal", "operand": false}
+			{"key": "selection_empty", "operator": "equal", "operand": true},
+			{"key": "panel_has_focus", "operator": "equal", "operand": false},
+			{"key": "overlay_has_focus", "operator": "equal", "operand": false}
 		]
 	}
 ]

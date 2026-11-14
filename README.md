@@ -27,8 +27,8 @@ No third-party dependencies: the plugin uses the bundled Python 3.8 only.
 ## Usage
 
 1. Select code or text. Multiple selections are supported and joined with a blank
-   line.
-2. Press `Ctrl+Enter` (`Super+Enter` on macOS) or run
+   line. With an empty selection the plugin sends only the instruction.
+2. Press `Alt+Enter` (`Option+Enter` on macOS) or run
    `ZotInstruct: Send Selection with Instruction` from the Command Palette
    (`Ctrl+Shift+P`).
 3. Type the instruction in the input panel and press `Enter`. The panel is
@@ -39,10 +39,7 @@ No third-party dependencies: the plugin uses the bundled Python 3.8 only.
 Additional command:
 
 - `ZotInstruct: Send Prompt Only` (`zot_instruct_prompt`) sends the instruction
-  without code.
-
-With an empty selection the plugin does not intercept `Ctrl+Enter`, so the
-default behavior is preserved.
+  without code. This is what `Alt+Enter` runs when the selection is empty.
 
 ## Settings
 
