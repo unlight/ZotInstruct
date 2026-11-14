@@ -84,14 +84,17 @@ editor-bridge-<sha256(cwd)[:8]>.port
 ```
 
 The plugin hashes the project root open in Sublime Text (the window folder
-containing the active file), normalizes it like Go `filepath.Clean`, and looks
-for the file:
+containing the active file), normalizes it like Go `filepath.Clean`, and checks
+these locations:
 
 1. `$ZOT_HOME/editor-bridge-<hash>.port` when `ZOT_HOME` is set;
 2. otherwise in the zot state directory (`$XDG_STATE_HOME/zot` or
    `~/.local/state/zot` on Linux, `~/Library/Application Support/zot` on macOS,
    `%LOCALAPPDATA%\zot` on Windows);
 3. when `ZOT_HOME` is unset, the compatible `~/.zot` copy.
+
+Start zot in the project root: a session started in a subdirectory hashes to a
+different file and is not found.
 
 Before sending, the plugin calls `GET /health` with a one second timeout and
 requires the reported `cwd` to match the project root. A stale file is removed
