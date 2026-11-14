@@ -1,4 +1,5 @@
 import hashlib
+import http.client
 import json
 import os
 import threading
@@ -92,13 +93,12 @@ def _health_check(port, root):
   try:
     with urllib.request.urlopen(request, timeout=HEALTH_TIMEOUT) as response:
       payload = json.loads(response.read().decode("utf-8"))
-  except (OSError, ValueError):
+  except (OSError, ValueError, http.client.HTTPException):
     return False
-  return (
-    isinstance(payload, dict)
-    and payload.get("ok") is True
-    and payload.get("cwd") == root
-  )
+  if not isinstance(payload, dict) or payload.get("ok") is not True:
+    return False
+  cwd = payload.get("cwd")
+  return isinstance(cwd, str) and _clean_path(cwd) == root
 
 
 def _remove_stale(path, port):
@@ -205,7 +205,7 @@ def _post(url, port, payload, timeout):
     print("[ZotInstruct] {}: {}".format(url, message))
     sublime.set_timeout(lambda: sublime.status_message(message), 0)
     return
-  except (urllib.error.URLError, OSError) as exc:
+  except (urllib.error.URLError, OSError, http.client.HTTPException) as exc:
     print("[ZotInstruct] {}: {!r}".format(url, exc))
     sublime.set_timeout(
       lambda: sublime.status_message(UNAVAILABLE_MESSAGE), 0

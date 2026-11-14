@@ -66,11 +66,21 @@ class _View:
     return self._window
 
 
-class _HealthHandler(BaseHTTPRequestHandler):
+class _BridgeHandler(BaseHTTPRequestHandler):
   cwd = "/"
+  sent = []
 
   def do_GET(self):
-    body = json.dumps({"ok": True, "cwd": self.cwd}).encode("utf-8")
+    self._reply({"ok": True, "cwd": self.cwd})
+
+  def do_POST(self):
+    length = int(self.headers.get("Content-Length", 0))
+    body = self.rfile.read(length).decode("utf-8")
+    _BridgeHandler.sent.append(json.loads(body))
+    self._reply({"ok": True})
+
+  def _reply(self, payload):
+    body = json.dumps(payload).encode("utf-8")
     self.send_response(200)
     self.send_header("Content-Type", "application/json")
     self.send_header("Content-Length", str(len(body)))
@@ -116,17 +126,29 @@ with tempfile.TemporaryDirectory() as directory:
 
   root = "/work/app"
   port_path = os.path.join(zot_home, name)
-  server = HTTPServer(("127.0.0.1", 0), _HealthHandler)
+  server = HTTPServer(("127.0.0.1", 0), _BridgeHandler)
   thread = threading.Thread(target=server.serve_forever, daemon=True)
   thread.start()
   try:
     _write_port(port_path, server.server_port)
-    _HealthHandler.cwd = root
+    _BridgeHandler.cwd = root + "/"
     assert plugin._discover_port(root) == server.server_port
 
-    _HealthHandler.cwd = "/work/other"
+    _BridgeHandler.cwd = "/work/other"
     assert plugin._discover_port(root) is None
     assert not os.path.exists(port_path)
+
+    _BridgeHandler.cwd = root
+    _write_port(port_path, server.server_port)
+    payload = {
+      "code": "print(1)",
+      "instruction": "review",
+      "file": "/work/app/app.py",
+      "language": "py",
+      "mode": "prompt",
+    }
+    plugin._deliver(_config(), root, payload)
+    assert _BridgeHandler.sent == [payload]
   finally:
     server.shutdown()
     server.server_close()
