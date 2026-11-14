@@ -59,7 +59,7 @@ default behavior is preserved.
 | `instruction_defaults` | see the settings file | Instruction templates per extension; the `default` key covers the rest. |
 
 Keys in `instruction_defaults` may list several extensions separated by commas:
-`"ts,tsx,js,jsx"`.
+`"ts,tsx,mts"`.
 
 ### Per-project overrides
 

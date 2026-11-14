@@ -6,7 +6,8 @@
 	"mode": "prompt",
 	"instruction_defaults": {
 		"py": "Refactor this code and check it for possible bugs.",
-		"ts,tsx,js,jsx": "Improve the readability and typing of this snippet.",
+		"ts,tsx,mts": "Improve the readability and typing of this snippet.",
+		"js,jsx,mjs": "Improve the readability of this snippet.",
 		"go": "Review the error handling and optimize this code.",
 		"default": "Analyze this snippet and suggest improvements."
 	}

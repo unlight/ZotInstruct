@@ -107,12 +107,16 @@ with tempfile.TemporaryDirectory() as directory:
 
 defaults = {
   "py": "python",
-  "ts,tsx,js,jsx": "javascript",
+  "ts,tsx,mts": "typescript",
+  "js,jsx,mjs": "javascript",
   "go": "go",
   "default": "generic",
 }
 assert plugin._default_instruction(defaults, "py") == "python"
-assert plugin._default_instruction(defaults, "tsx") == "javascript"
+assert plugin._default_instruction(defaults, "tsx") == "typescript"
+assert plugin._default_instruction(defaults, "mts") == "typescript"
+assert plugin._default_instruction(defaults, "jsx") == "javascript"
+assert plugin._default_instruction(defaults, "mjs") == "javascript"
 assert plugin._default_instruction(defaults, "rs") == "generic"
 assert plugin._default_instruction(defaults, "") == "generic"
 assert plugin._default_instruction("broken", "py") == ""
