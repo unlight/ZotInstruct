@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/unlight/ZotInstruct/compare/v1.0.1...v1.0.2) (2026-11-14)
+
+### Bug Fixes
+
+* Add settings entries to menu and palette ([440a107](https://github.com/unlight/ZotInstruct/commit/440a1074653f346dbd26e23bb83628d4f40c6cc3))
+
 ## [1.0.1](https://github.com/unlight/ZotInstruct/compare/v1.0.0...v1.0.1) (2026-11-14)
 
 ### Bug Fixes
