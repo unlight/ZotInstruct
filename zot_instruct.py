@@ -11,7 +11,7 @@ import sublime_plugin
 SETTINGS_FILE = "ZotInstruct.sublime-settings"
 CONFIG_KEY = "zot_instruct"
 FALLBACK_PORT = 47123
-INPUT_CAPTION = "Zot Instruction:"
+INPUT_CAPTION = "Instruction"
 UNAVAILABLE_MESSAGE = "ZotInstruct: zot-editor-bridge unavailable (start zot)"
 
 _HISTORY = {}
