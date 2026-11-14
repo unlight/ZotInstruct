@@ -13,7 +13,7 @@
 						"caption": "Zot Instruct",
 						"children": [
 							{
-								"caption": "Settings",
+								"caption": "ZotInstruct",
 								"command": "edit_settings",
 								"args": {
 									"base_file": "${packages}/ZotInstruct/ZotInstruct.sublime-settings",

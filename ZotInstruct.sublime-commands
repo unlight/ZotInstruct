@@ -1,6 +1,6 @@
 [
 	{
-		"caption": "Preferences: Zot Instruct Settings",
+		"caption": "Preferences: ZotInstruct Settings",
 		"command": "edit_settings",
 		"args": {
 			"base_file": "${packages}/ZotInstruct/ZotInstruct.sublime-settings",
@@ -8,7 +8,7 @@
 		}
 	},
 	{
-		"caption": "Preferences: Zot Instruct Key Bindings",
+		"caption": "Preferences: ZotInstruct Key Bindings",
 		"command": "edit_settings",
 		"args": {
 			"base_file": "${packages}/ZotInstruct/Default.sublime-keymap",

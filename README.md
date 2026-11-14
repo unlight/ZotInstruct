@@ -26,7 +26,7 @@ No third-party dependencies: the plugin uses the bundled Python 3.8 only.
 
 Key bindings are opt-in: copy the commented `alt+enter` entries from
 `Packages/ZotInstruct/Default.sublime-keymap` into `Preferences > Key Bindings`
-or run `Preferences: Zot Instruct Key Bindings` from the Command Palette.
+or run `Preferences: ZotInstruct Key Bindings` from the Command Palette.
 Without them use the Command Palette.
 
 ## Usage
@@ -49,7 +49,7 @@ Additional command:
 
 ## Settings
 
-`Preferences > Package Settings > Zot Instruct > Settings` opens the settings;
+`Preferences > Package Settings > ZotInstruct > Settings` opens the settings;
 `Key Bindings` opens the keymap. Files in `Packages/User/` override the
 defaults.
 
