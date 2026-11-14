@@ -9,7 +9,7 @@ the `zot-editor-bridge` extension.
 Clone the repository into the Sublime Text `Packages` directory:
 
 ```bash
-git clone <repo-url> \
+git clone https://github.com/unlight/ZotInstruct.git \
   "$HOME/.config/sublime-text/Packages/ZotInstruct"
 ```
 
