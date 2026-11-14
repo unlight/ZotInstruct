@@ -1,7 +1,7 @@
 # ZotInstruct
 
 A Sublime Text 4 plugin that sends the selected code together with an instruction
-to the active [zot](https://github.com/) session through the local HTTP server of
+to the active [zot](https://www.zot.sh/) session through the local HTTP server of
 the `zot-editor-bridge` extension.
 
 ## Install
