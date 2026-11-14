@@ -1,3 +1,9 @@
+## [1.0.4](https://github.com/unlight/ZotInstruct/compare/v1.0.3...v1.0.4) (2026-11-14)
+
+### Bug Fixes
+
+* Correct package settings menu structure ([17a7415](https://github.com/unlight/ZotInstruct/commit/17a74155826a7659fd1270187dc7aedccb3a06f8))
+
 ## [1.0.3](https://github.com/unlight/ZotInstruct/compare/v1.0.2...v1.0.3) (2026-11-14)
 
 ### Bug Fixes
