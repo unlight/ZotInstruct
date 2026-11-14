@@ -10,10 +10,10 @@
 				"id": "package-settings",
 				"children": [
 					{
-						"caption": "Zot Instruct",
+						"caption": "ZotInstruct",
 						"children": [
 							{
-								"caption": "ZotInstruct",
+								"caption": "Settings",
 								"command": "edit_settings",
 								"args": {
 									"base_file": "${packages}/ZotInstruct/ZotInstruct.sublime-settings",
