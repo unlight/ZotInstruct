@@ -1,5 +1,22 @@
 [
 	{
+		"caption": "Preferences: Zot Instruct Settings",
+		"command": "edit_settings",
+		"args": {
+			"base_file": "${packages}/ZotInstruct/ZotInstruct.sublime-settings",
+			"default": "// Settings in here override those in \"ZotInstruct/ZotInstruct.sublime-settings\".\n\n{\n\t$0\n}\n"
+		}
+	},
+	{
+		"caption": "Preferences: Zot Instruct Key Bindings",
+		"command": "edit_settings",
+		"args": {
+			"base_file": "${packages}/ZotInstruct/Default.sublime-keymap",
+			"user_file": "${packages}/User/Default (${platform}).sublime-keymap",
+			"default": "[\n\t$0\n]\n"
+		}
+	},
+	{
 		"caption": "Zot Instruct: Send Selection with Instruction",
 		"command": "zot_instruct"
 	},

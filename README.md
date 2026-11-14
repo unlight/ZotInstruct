@@ -25,7 +25,8 @@ Restart Sublime Text or run `sublime_plugin.reload_plugin` from the console
 No third-party dependencies: the plugin uses the bundled Python 3.8 only.
 
 Key bindings are opt-in: copy the commented `alt+enter` entries from
-`Packages/ZotInstruct/Default.sublime-keymap` into `Preferences > Key Bindings`.
+`Packages/ZotInstruct/Default.sublime-keymap` into `Preferences > Key Bindings`
+or run `Preferences: Zot Instruct Key Bindings` from the Command Palette.
 Without them use the Command Palette.
 
 ## Usage
