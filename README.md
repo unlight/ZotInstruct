@@ -133,3 +133,7 @@ python3 tests/selfcheck.py
 
 The plugin targets the Python 3.8 runtime bundled with Sublime Text 4; CI also
 runs the self-check on Python 3.12.
+
+## License
+
+[MIT](https://opensource.org/licenses/MIT), Copyright (c) 2026
