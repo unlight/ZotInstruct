@@ -1,3 +1,9 @@
+## [1.0.3](https://github.com/unlight/ZotInstruct/compare/v1.0.2...v1.0.3) (2026-11-14)
+
+### Bug Fixes
+
+* Match package name in settings labels ([4bf0d0f](https://github.com/unlight/ZotInstruct/commit/4bf0d0fe9a2c0551d2e38bedaf8bc0ed30fb8e25))
+
 ## [1.0.2](https://github.com/unlight/ZotInstruct/compare/v1.0.1...v1.0.2) (2026-11-14)
 
 ### Bug Fixes
