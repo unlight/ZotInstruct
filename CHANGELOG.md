@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/unlight/ZotInstruct/compare/v1.0.0...v1.0.1) (2026-11-14)
+
+### Bug Fixes
+
+* Make key bindings opt-in ([c21166e](https://github.com/unlight/ZotInstruct/commit/c21166e3ac42f208c97159e59af88960fd48fd6d))
+
 ## 1.0.0 (2026-11-14)
 
 ### Features
