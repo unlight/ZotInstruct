@@ -133,15 +133,3 @@ python3 tests/selfcheck.py
 
 The plugin targets the Python 3.8 runtime bundled with Sublime Text 4; CI also
 runs the self-check on Python 3.12.
-
-## Release
-
-Releases are automated by semantic-release on pushes to `master`
-(`.github/workflows/ci.yml`). Commit messages must follow Conventional Commits:
-
-- `fix` creates a patch release;
-- `feat` creates a minor release;
-- `feat!` or a `BREAKING CHANGE` footer creates a major release;
-- `docs`, `chore`, `refactor`, `test`, `build`, and `ci` create no release.
-
-A release creates the tag and the GitHub release and commits `CHANGELOG.md`.
