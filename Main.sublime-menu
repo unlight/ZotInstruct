@@ -1,17 +1,34 @@
 [
 	{
+		"caption": "Preferences",
+		"mnemonic": "n",
 		"id": "preferences",
 		"children": [
 			{
+				"caption": "Package Settings",
+				"mnemonic": "P",
 				"id": "package-settings",
 				"children": [
 					{
 						"caption": "ZotInstruct",
-						"command": "edit_settings",
-						"args": {
-							"base_file": "${packages}/ZotInstruct/ZotInstruct.sublime-settings",
-							"default": "{\n\t$0\n}\n"
-						}
+						"children": [
+							{
+								"caption": "Settings",
+								"command": "edit_settings",
+								"args": {
+									"base_file": "${packages}/ZotInstruct/ZotInstruct.sublime-settings",
+									"default": "// Settings in here override those in \"ZotInstruct/ZotInstruct.sublime-settings\".\n\n{\n\t$0\n}\n"
+								}
+							},
+							{
+								"caption": "Key Bindings",
+								"command": "edit_settings",
+								"args": {
+									"base_file": "${packages}/ZotInstruct/Default.sublime-keymap",
+									"default": "[\n\t$0\n]\n"
+								}
+							}
+						]
 					}
 				]
 			}

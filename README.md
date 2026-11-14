@@ -43,8 +43,9 @@ Additional command:
 
 ## Settings
 
-`Preferences > Package Settings > ZotInstruct` opens the settings (the file
-`Packages/User/ZotInstruct.sublime-settings` overrides the defaults).
+`Preferences > Package Settings > ZotInstruct > Settings` opens the settings;
+`Key Bindings` opens the keymap. Files in `Packages/User/` override the
+defaults.
 
 | Setting | Default | Meaning |
 | --- | --- | --- |
