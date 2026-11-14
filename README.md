@@ -49,9 +49,7 @@ defaults.
 
 | Setting | Default | Meaning |
 | --- | --- | --- |
-| `url` | `""` | Full `/send` URL. A non-empty value disables port file discovery. |
-| `port_file` | `""` | Explicit port file path; `~` is expanded. Empty enables state directory discovery. |
-| `fallback_port` | `47123` | Port used when the port file is missing or empty. |
+| `url` | `""` | Full `/send` URL. A non-empty value skips port discovery and the health check. |
 | `request_timeout` | `5` | HTTP request timeout in seconds. |
 | `mode` | `"prompt"` | `prompt` submits the request to the agent, `notify` only reports status. |
 | `instruction_defaults` | see the settings file | Instruction templates per extension; the `default` key covers the rest. |
@@ -80,19 +78,31 @@ These keys override `ZotInstruct.sublime-settings` for that project only.
 
 ## zot-editor-bridge integration
 
-The `zot-editor-bridge` extension starts an HTTP server on `127.0.0.1` and writes
-its port to `editor-bridge.port` in zot's state directory:
+The `zot-editor-bridge` extension runs an HTTP server inside each zot process and
+publishes its port in a file named after the session working directory:
 
-1. `$ZOT_HOME` when set;
-2. `$XDG_STATE_HOME/zot` when `XDG_STATE_HOME` is set;
-3. otherwise `~/.local/state/zot` on Linux, `~/Library/Application Support/zot`
-   on macOS, or `%LOCALAPPDATA%\zot` on Windows.
+```text
+editor-bridge-<sha256(cwd)[:8]>.port
+```
 
-When `ZOT_HOME` is unset, the bridge also writes a compatible copy to
-`~/.zot/editor-bridge.port`.
+The plugin hashes the project root open in Sublime Text (the window folder
+containing the active file), normalizes it like Go `filepath.Clean`, and looks
+for the file:
 
-Unless `port_file` is set, the plugin checks the same locations in this order,
-with the legacy `~/.zot` copy last.
+1. `$ZOT_HOME/editor-bridge-<hash>.port` when `ZOT_HOME` is set;
+2. otherwise in the zot state directory (`$XDG_STATE_HOME/zot` or
+   `~/.local/state/zot` on Linux, `~/Library/Application Support/zot` on macOS,
+   `%LOCALAPPDATA%\zot` on Windows);
+3. when `ZOT_HOME` is unset, the compatible `~/.zot` copy.
+
+Before sending, the plugin calls `GET /health` with a one second timeout and
+requires the reported `cwd` to match the project root. A stale file is removed
+only if it still contains the same port. Discovery runs on every send, never in
+the background.
+
+Each zot window in a different project gets its own file, so requests reach the
+session started in that project. Two zot windows in the same project share one
+file: the last started window wins.
 
 Install the extension:
 
@@ -101,24 +111,16 @@ cd zot-editor-bridge
 zot ext install .
 ```
 
-Start zot: the extension reports the port on startup, and the `/editor-bridge`
-command shows the current `/send` and `/health` URLs.
-
-Manual check:
-
-```bash
-# Linux default; adjust for ZOT_HOME or XDG_STATE_HOME
-PORT=$(cat ~/.local/state/zot/editor-bridge.port)
-curl "http://127.0.0.1:$PORT/health"
-```
+Start zot: the extension reports the port on startup. Run `/editor-bridge` in
+zot to print its `/send` and `/health` URLs and the port file path.
 
 ## Troubleshooting
 
 Errors appear in the status bar; details are printed to the Sublime Text console
 (``Ctrl+` ``) with the `[ZotInstruct]` prefix.
 
-- `zot-editor-bridge unavailable (start zot)` means the port does not answer:
-  make sure zot is running with the extension and the port file exists.
+- `zot is not running for this project` means no live port file matched the
+  project root: start zot in the project directory.
 - `HTTP 4xx/5xx` means the server returned an error; the response text is shown
   in the status bar and the console.
 

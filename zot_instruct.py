@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import threading
@@ -10,10 +11,10 @@ import sublime_plugin
 
 SETTINGS_FILE = "ZotInstruct.sublime-settings"
 CONFIG_KEY = "zot_instruct"
-FALLBACK_PORT = 47123
 SEND_URL_TEMPLATE = "http://127.0.0.1:{}/send"
+HEALTH_TIMEOUT = 1
 INPUT_CAPTION = "Instruction"
-UNAVAILABLE_MESSAGE = "ZotInstruct: zot-editor-bridge unavailable (start zot)"
+UNAVAILABLE_MESSAGE = "ZotInstruct: zot is not running for this project"
 
 _HISTORY = {}
 
@@ -27,8 +28,6 @@ def _load_config(window):
   settings = sublime.load_settings(SETTINGS_FILE)
   config = {
     "url": _setting(settings, "url", ""),
-    "port_file": _setting(settings, "port_file", ""),
-    "fallback_port": _setting(settings, "fallback_port", FALLBACK_PORT),
     "request_timeout": _setting(settings, "request_timeout", 5),
     "mode": _setting(settings, "mode", "prompt"),
     "instruction_defaults": _setting(settings, "instruction_defaults", {}),
@@ -55,16 +54,27 @@ def _env(name):
   return (os.environ.get(name) or "").strip()
 
 
-def _port_file_candidates(config):
-  port_file = str(config["port_file"]).strip()
-  if port_file:
-    return [os.path.expanduser(port_file)]
+def _clean_path(path):
+  path = os.path.normpath(path)
+  if os.name != "nt" and path.startswith("//"):
+    path = "/" + path.lstrip("/")
+  return path
 
-  # Mirrors zot's state dir, then the bridge's legacy ~/.zot copy.
+
+def _port_file_name(root):
+  digest = hashlib.sha256(root.encode("utf-8")).hexdigest()
+  return "editor-bridge-{}.port".format(digest[:8])
+
+
+def _port_file_paths(root):
+  name = _port_file_name(root)
+  zot_home = _env("ZOT_HOME")
+  if zot_home:
+    return [os.path.join(zot_home, name)]
+
   home = os.path.expanduser("~")
   xdg_state = _env("XDG_STATE_HOME")
   dirs = [
-    _env("ZOT_HOME"),
     os.path.join(xdg_state, "zot") if xdg_state else "",
     _env("LOCALAPPDATA"),
     os.path.join(home, ".local", "state", "zot"),
@@ -73,24 +83,67 @@ def _port_file_candidates(config):
   ]
   paths = []
   for directory in dirs:
-    path = os.path.join(directory, "editor-bridge.port") if directory else ""
+    path = os.path.join(directory, name) if directory else ""
     if path and path not in paths:
       paths.append(path)
   return paths
 
 
-def _resolve_target(config):
-  url = str(config["url"]).strip()
-  if url:
-    return url, urllib.parse.urlsplit(url).port
+def _health_check(port, root):
+  request = urllib.request.Request("http://127.0.0.1:{}/health".format(port))
+  try:
+    with urllib.request.urlopen(request, timeout=HEALTH_TIMEOUT) as response:
+      payload = json.loads(response.read().decode("utf-8"))
+  except (OSError, ValueError):
+    return False
+  return (
+    isinstance(payload, dict)
+    and payload.get("ok") is True
+    and payload.get("cwd") == root
+  )
 
-  for path in _port_file_candidates(config):
+
+def _remove_stale(path, port):
+  # Keep the file if another session has already replaced it.
+  if _read_port(path) != port:
+    return
+  try:
+    os.remove(path)
+  except OSError:
+    pass
+
+
+def _discover_port(root):
+  for path in _port_file_paths(root):
     port = _read_port(path)
-    if port is not None:
-      return SEND_URL_TEMPLATE.format(port), port
+    if port is None:
+      continue
+    if _health_check(port, root):
+      return port
+    _remove_stale(path, port)
+  return None
 
-  port = int(config["fallback_port"])
-  return SEND_URL_TEMPLATE.format(port), port
+
+def _is_within(path, directory):
+  try:
+    return os.path.commonpath([path, directory]) == directory
+  except ValueError:
+    return False
+
+
+def _project_root(view):
+  window = view.window()
+  folders = window.folders() if window is not None else []
+  folders = [_clean_path(folder) for folder in folders]
+  file_name = view.file_name()
+  if file_name:
+    file_name = _clean_path(file_name)
+    for folder in sorted(folders, key=len, reverse=True):
+      if _is_within(file_name, folder):
+        return folder
+  if folders:
+    return folders[0]
+  return _clean_path(os.path.dirname(file_name)) if file_name else None
 
 
 def _language(view):
@@ -171,6 +224,23 @@ def _post(url, port, payload, timeout):
   sublime.set_timeout(lambda: sublime.status_message(message), 0)
 
 
+def _deliver(config, root, payload):
+  timeout = int(config["request_timeout"])
+  url = str(config["url"]).strip()
+  if url:
+    _post(url, urllib.parse.urlsplit(url).port, payload, timeout)
+    return
+
+  port = _discover_port(root) if root else None
+  if port is None:
+    print("[ZotInstruct] no live zot session for {}".format(root))
+    sublime.set_timeout(
+      lambda: sublime.status_message(UNAVAILABLE_MESSAGE), 0
+    )
+    return
+  _post(SEND_URL_TEMPLATE.format(port), port, payload, timeout)
+
+
 def _submit(view, code, instruction, config):
   instruction = instruction.strip()
   if not instruction:
@@ -180,8 +250,9 @@ def _submit(view, code, instruction, config):
     _HISTORY[_history_key(view)] = instruction
     file_name = view.file_name() or "untitled"
     language = _language(view)
+    root = _project_root(view)
   else:
-    file_name, language = "untitled", ""
+    file_name, language, root = "untitled", "", None
 
   payload = {
     "code": code,
@@ -190,10 +261,9 @@ def _submit(view, code, instruction, config):
     "language": language,
     "mode": str(config["mode"]),
   }
-  url, port = _resolve_target(config)
   threading.Thread(
-    target=_post,
-    args=(url, port, payload, int(config["request_timeout"])),
+    target=_deliver,
+    args=(config, root, payload),
     daemon=True,
   ).start()
 

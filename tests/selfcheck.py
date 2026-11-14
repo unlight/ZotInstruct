@@ -1,8 +1,11 @@
 import importlib.util
+import json
 import os
 import sys
 import tempfile
+import threading
 import types
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SETTINGS = {}
@@ -33,8 +36,6 @@ spec.loader.exec_module(plugin)
 def _config(**overrides):
   config = {
     "url": "",
-    "port_file": "",
-    "fallback_port": 47123,
     "request_timeout": 5,
     "mode": "prompt",
     "instruction_defaults": {},
@@ -46,7 +47,7 @@ def _config(**overrides):
 def _write_port(path, port):
   os.makedirs(os.path.dirname(path), exist_ok=True)
   with open(path, "w", encoding="utf-8") as handle:
-    handle.write(str(port))
+    handle.write("{}\n".format(port))
 
 
 def _clear_env():
@@ -54,13 +55,47 @@ def _clear_env():
     os.environ.pop(name, None)
 
 
-def _port(config):
-  return plugin._resolve_target(_config(**config))[1]
+class _View:
+  def __init__(self, file_name, folders):
+    self._file_name = file_name
+    self._window = types.SimpleNamespace(folders=lambda: folders)
+
+  def file_name(self):
+    return self._file_name
+
+  def window(self):
+    return self._window
 
 
-assert plugin._resolve_target(
-  _config(url="http://example.test:9000/send")
-) == ("http://example.test:9000/send", 9000)
+class _HealthHandler(BaseHTTPRequestHandler):
+  cwd = "/"
+
+  def do_GET(self):
+    body = json.dumps({"ok": True, "cwd": self.cwd}).encode("utf-8")
+    self.send_response(200)
+    self.send_header("Content-Type", "application/json")
+    self.send_header("Content-Length", str(len(body)))
+    self.end_headers()
+    self.wfile.write(body)
+
+  def log_message(self, *args):
+    pass
+
+
+assert plugin._clean_path("/tmp//./a/../project/") == "/tmp/project"
+assert plugin._clean_path("///tmp//project") == "/tmp/project"
+assert plugin._port_file_name("/home/roman/Dev/zot-editor-bridge") == (
+  "editor-bridge-7db538f0.port"
+)
+
+assert plugin._project_root(
+  _View("/work/api/src/app.py", ["/work/web", "/work/api"])
+) == "/work/api"
+assert plugin._project_root(
+  _View("/work/api/src/app.py", ["/work", "/work/api"])
+) == "/work/api"
+assert plugin._project_root(_View(None, ["/work/api"])) == "/work/api"
+assert plugin._project_root(_View("/work/single.py", [])) == "/work"
 
 with tempfile.TemporaryDirectory() as directory:
   home = os.path.join(directory, "home")
@@ -69,35 +104,33 @@ with tempfile.TemporaryDirectory() as directory:
   os.environ["HOME"] = home
   _clear_env()
 
-  explicit = os.path.join(directory, "custom.port")
-  _write_port(explicit, 5000)
-  assert plugin._resolve_target(
-    _config(port_file=explicit, fallback_port=1)
-  ) == ("http://127.0.0.1:5000/send", 5000)
-
-  _write_port(explicit, 0)
-  assert _port({"port_file": explicit, "fallback_port": 1}) == 1
-  assert _port({
-    "port_file": os.path.join(directory, "missing.port"), "fallback_port": 1,
-  }) == 1
-
-  _write_port(os.path.join(home, ".zot", "editor-bridge.port"), 1111)
-  assert _port({"fallback_port": 1}) == 1111
-
-  _write_port(
-    os.path.join(home, ".local", "state", "zot", "editor-bridge.port"), 2222
-  )
-  assert _port({"fallback_port": 1}) == 2222
-
-  xdg = os.path.join(directory, "xdg")
-  os.environ["XDG_STATE_HOME"] = xdg
-  _write_port(os.path.join(xdg, "zot", "editor-bridge.port"), 3333)
-  assert _port({"fallback_port": 1}) == 3333
+  name = plugin._port_file_name("/work/app")
+  paths = plugin._port_file_paths("/work/app")
+  assert os.path.join(home, ".zot", name) in paths
+  assert any(path.endswith(os.path.join("zot", name)) for path in paths)
 
   zot_home = os.path.join(directory, "zot_home")
   os.environ["ZOT_HOME"] = zot_home
-  _write_port(os.path.join(zot_home, "editor-bridge.port"), 4444)
-  assert _port({"fallback_port": 1}) == 4444
+  assert plugin._port_file_paths("/work/app") == [
+    os.path.join(zot_home, name)
+  ]
+
+  root = "/work/app"
+  port_path = os.path.join(zot_home, name)
+  server = HTTPServer(("127.0.0.1", 0), _HealthHandler)
+  thread = threading.Thread(target=server.serve_forever, daemon=True)
+  thread.start()
+  try:
+    _write_port(port_path, server.server_port)
+    _HealthHandler.cwd = root
+    assert plugin._discover_port(root) == server.server_port
+
+    _HealthHandler.cwd = "/work/other"
+    assert plugin._discover_port(root) is None
+    assert not os.path.exists(port_path)
+  finally:
+    server.shutdown()
+    server.server_close()
 
   if saved_home is None:
     os.environ.pop("HOME", None)
