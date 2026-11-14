@@ -1,0 +1,10 @@
+[
+	{
+		"caption": "ZotInstruct: Send Selection with Instruction",
+		"command": "zot_instruct"
+	},
+	{
+		"caption": "ZotInstruct: Send Prompt Only",
+		"command": "zot_instruct_prompt"
+	}
+]

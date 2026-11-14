@@ -1,0 +1,9 @@
+[
+	{
+		"keys": ["ctrl+enter"],
+		"command": "zot_instruct",
+		"context": [
+			{"key": "selection_empty", "operator": "equal", "operand": false}
+		]
+	}
+]
