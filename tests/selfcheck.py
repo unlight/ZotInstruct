@@ -35,7 +35,6 @@ spec.loader.exec_module(plugin)
 
 def _config(**overrides):
   config = {
-    "url": "",
     "request_timeout": 5,
     "mode": "prompt",
     "instruction_defaults": {},

@@ -3,7 +3,6 @@ import json
 import os
 import threading
 import urllib.error
-import urllib.parse
 import urllib.request
 
 import sublime
@@ -27,7 +26,6 @@ def _setting(settings, key, default):
 def _load_config(window):
   settings = sublime.load_settings(SETTINGS_FILE)
   config = {
-    "url": _setting(settings, "url", ""),
     "request_timeout": _setting(settings, "request_timeout", 5),
     "mode": _setting(settings, "mode", "prompt"),
     "instruction_defaults": _setting(settings, "instruction_defaults", {}),
@@ -183,12 +181,6 @@ def _initial_instruction(view, config):
   return _default_instruction(config["instruction_defaults"], _language(view))
 
 
-def _sent_text(port):
-  if port:
-    return "ZotInstruct: sent to zot (port {})".format(port)
-  return "ZotInstruct: sent to zot"
-
-
 def _http_error_text(exc):
   try:
     detail = exc.read().decode("utf-8", "replace").strip()
@@ -220,17 +212,11 @@ def _post(url, port, payload, timeout):
     )
     return
 
-  message = _sent_text(port)
+  message = "ZotInstruct: sent to zot (port {})".format(port)
   sublime.set_timeout(lambda: sublime.status_message(message), 0)
 
 
 def _deliver(config, root, payload):
-  timeout = int(config["request_timeout"])
-  url = str(config["url"]).strip()
-  if url:
-    _post(url, urllib.parse.urlsplit(url).port, payload, timeout)
-    return
-
   port = _discover_port(root) if root else None
   if port is None:
     print("[ZotInstruct] no live zot session for {}".format(root))
@@ -238,7 +224,12 @@ def _deliver(config, root, payload):
       lambda: sublime.status_message(UNAVAILABLE_MESSAGE), 0
     )
     return
-  _post(SEND_URL_TEMPLATE.format(port), port, payload, timeout)
+  _post(
+    SEND_URL_TEMPLATE.format(port),
+    port,
+    payload,
+    int(config["request_timeout"]),
+  )
 
 
 def _submit(view, code, instruction, config):

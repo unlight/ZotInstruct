@@ -49,7 +49,6 @@ defaults.
 
 | Setting | Default | Meaning |
 | --- | --- | --- |
-| `url` | `""` | Full `/send` URL. A non-empty value skips port discovery and the health check. |
 | `request_timeout` | `5` | HTTP request timeout in seconds. |
 | `mode` | `"prompt"` | `prompt` submits the request to the agent, `notify` only reports status. |
 | `instruction_defaults` | see the settings file | Instruction templates per extension; the `default` key covers the rest. |
@@ -67,7 +66,6 @@ file:
   "folders": [{ "path": "." }],
   "settings": {
     "zot_instruct": {
-      "url": "http://127.0.0.1:47831/send",
       "request_timeout": 10
     }
   }
@@ -103,6 +101,9 @@ the background.
 Each zot window in a different project gets its own file, so requests reach the
 session started in that project. Two zot windows in the same project share one
 file: the last started window wins.
+
+To pin the bridge port, set `ZOT_EDITOR_BRIDGE_PORT` before starting zot; the
+port file still receives the actual port in use.
 
 Install the extension:
 
