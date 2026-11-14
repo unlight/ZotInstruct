@@ -124,12 +124,11 @@ Errors appear in the status bar; details are printed to the Sublime Text console
 ## Development
 
 ```bash
-npm ci
-npm test
+python3 tests/selfcheck.py
 ```
 
-`npm test` runs `tests/selfcheck.py`. The plugin targets the Python 3.8 runtime
-bundled with Sublime Text 4; CI also runs the self-check on Python 3.12.
+The plugin targets the Python 3.8 runtime bundled with Sublime Text 4; CI also
+runs the self-check on Python 3.12.
 
 ## Release
 
@@ -141,5 +140,4 @@ Releases are automated by semantic-release on pushes to `master`
 - `feat!` or a `BREAKING CHANGE` footer creates a major release;
 - `docs`, `chore`, `refactor`, `test`, `build`, and `ci` create no release.
 
-A release creates the tag and the GitHub release, writes `CHANGELOG.md`, and
-commits the version bump in `package.json` and `package-lock.json`.
+A release creates the tag and the GitHub release and commits `CHANGELOG.md`.
