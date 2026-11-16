@@ -36,7 +36,6 @@ spec.loader.exec_module(plugin)
 def _config(**overrides):
   config = {
     "request_timeout": 5,
-    "mode": "prompt",
     "instruction_defaults": {},
   }
   config.update(overrides)
@@ -96,6 +95,7 @@ assert plugin._clean_path("///tmp//project") == "/tmp/project"
 assert plugin._port_file_name("/home/roman/Dev/zot-editor-bridge") == (
   "editor-bridge-7db538f0.port"
 )
+assert "mode" not in plugin._load_config(None)
 
 assert plugin._project_root(
   _View("/work/api/src/app.py", ["/work/web", "/work/api"])
@@ -145,7 +145,6 @@ with tempfile.TemporaryDirectory() as directory:
       "instruction": "review",
       "file": "/work/app/app.py",
       "language": "py",
-      "mode": "prompt",
     }
     plugin._deliver(_config(), root, payload)
     assert _BridgeHandler.sent == [payload]

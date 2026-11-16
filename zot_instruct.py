@@ -28,7 +28,6 @@ def _load_config(window):
   settings = sublime.load_settings(SETTINGS_FILE)
   config = {
     "request_timeout": _setting(settings, "request_timeout", 5),
-    "mode": _setting(settings, "mode", "prompt"),
     "instruction_defaults": _setting(settings, "instruction_defaults", {}),
   }
 
@@ -250,7 +249,6 @@ def _submit(view, code, instruction, config):
     "instruction": instruction,
     "file": file_name,
     "language": language,
-    "mode": str(config["mode"]),
   }
   threading.Thread(
     target=_deliver,

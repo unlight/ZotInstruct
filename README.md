@@ -56,7 +56,6 @@ defaults.
 | Setting | Default | Meaning |
 | --- | --- | --- |
 | `request_timeout` | `5` | HTTP request timeout in seconds. |
-| `mode` | `"prompt"` | `prompt` submits the request to the agent, `notify` only reports status. |
 | `instruction_defaults` | see the settings file | Instruction templates per extension; the `default` key covers the rest. |
 
 Keys in `instruction_defaults` may list several extensions separated by commas:
