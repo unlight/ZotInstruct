@@ -1,3 +1,9 @@
+## [1.0.5](https://github.com/unlight/ZotInstruct/compare/v1.0.4...v1.0.5) (2026-11-25)
+
+### Bug Fixes
+
+* Use Example.sublime-keymap for bindings ([4b08f0f](https://github.com/unlight/ZotInstruct/commit/4b08f0fcdeec980bb3680a5c9d911e00c4fe46b2))
+
 ## [1.0.4](https://github.com/unlight/ZotInstruct/compare/v1.0.3...v1.0.4) (2026-11-14)
 
 ### Bug Fixes
