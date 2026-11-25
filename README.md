@@ -24,10 +24,11 @@ Restart Sublime Text or run `sublime_plugin.reload_plugin` from the console
 
 No third-party dependencies: the plugin uses the bundled Python 3.8 only.
 
-Key bindings are opt-in: copy the commented `alt+enter` entries from
-`Packages/ZotInstruct/Default.sublime-keymap` into `Preferences > Key Bindings`
-or run `Preferences: ZotInstruct Key Bindings` from the Command Palette.
-Without them use the Command Palette.
+Key bindings are opt-in. Run `Preferences > Package Settings > ZotInstruct >
+Example Key Bindings` (or `Preferences: ZotInstruct Example Key Bindings` from
+the Command Palette) to open `Example.sublime-keymap` next to your user keymap,
+then copy the `alt+enter` entries you want. Without bindings use the Command
+Palette.
 
 ## Usage
 
@@ -50,8 +51,8 @@ Additional command:
 ## Settings
 
 `Preferences > Package Settings > ZotInstruct > Settings` opens the settings;
-`Key Bindings` opens the keymap. Files in `Packages/User/` override the
-defaults.
+`Example Key Bindings` opens the example keymap next to your user keymap. Files
+in `Packages/User/` override the defaults.
 
 | Setting | Default | Meaning |
 | --- | --- | --- |
